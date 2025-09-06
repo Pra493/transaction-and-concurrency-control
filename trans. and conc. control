@@ -48,7 +48,7 @@ VALUES
 ('Smaran', 'CSE102', '2024-07-01'),
 ('Vaibhav', 'CSE101', '2024-07-01');
 
--- ✅ Show all three records first
+
 SELECT * FROM StudentEnrollments;
 
 START TRANSACTION;
