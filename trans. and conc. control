@@ -1,0 +1,153 @@
+--Practice 1
+DROP TABLE IF EXISTS FeePayments;
+create table FeePayments (
+  payment_id int primary key,
+  student_name varchar(100) not null,
+  amount decimal(10,2) check (amount > 0),
+  payment_date date
+);
+start transaction;
+insert into FeePayments values (1, 'Ashish', 5000.00, '2024-06-01');
+insert into FeePayments values (2, 'Smaran', 4500.00, '2024-06-02');
+insert into FeePayments values (3, 'Vaibhav', 5500.00, '2024-06-03');
+commit;
+select * from FeePayments;
+
+start transaction;
+insert into FeePayments values (4, 'Kiran', 4800.00, '2024-06-04');
+insert into FeePayments values (5, 'Raj', 4900.00, '2024-06-05');
+rollback;
+select * from FeePayments;
+
+start transaction;
+insert into FeePayments values (9, 'Sneha', 4700.00, '2024-06-08');
+insert into FeePayments values (8, 'Kiran', 4800.00, '2024-06-09');
+rollback;
+select * from FeePayments;
+
+start transaction;
+insert into FeePayments values (7, 'Sneha', 4700.00, '2024-06-08');
+insert into FeePayments values (8, 'Arjun', 4900.00, '2024-06-09');
+commit;
+select * from FeePayments;
+
+--Practice 2
+DROP TABLE IF EXISTS StudentEnrollments;
+
+CREATE TABLE StudentEnrollments (
+    enrollment_id INT AUTO_INCREMENT PRIMARY KEY,
+    student_name VARCHAR(100),
+    course_id VARCHAR(10),
+    enrollment_date DATE,
+    UNIQUE(student_name, course_id)
+);
+
+INSERT INTO StudentEnrollments (student_name, course_id, enrollment_date)
+VALUES 
+('Ashish', 'CSE101', '2024-07-01'),
+('Smaran', 'CSE102', '2024-07-01'),
+('Vaibhav', 'CSE101', '2024-07-01');
+
+-- ✅ Show all three records first
+SELECT * FROM StudentEnrollments;
+
+START TRANSACTION;
+INSERT IGNORE INTO StudentEnrollments (student_name, course_id, enrollment_date)
+VALUES ('Ashish', 'CSE101', CURDATE());
+COMMIT;
+
+START TRANSACTION;
+INSERT IGNORE INTO StudentEnrollments (student_name, course_id, enrollment_date)
+VALUES ('Ashish', 'CSE101', CURDATE());
+COMMIT;
+
+START TRANSACTION;
+SELECT * FROM StudentEnrollments
+WHERE student_name = 'Ashish' AND course_id = 'CSE101'
+FOR UPDATE;
+
+START TRANSACTION;
+UPDATE StudentEnrollments
+SET enrollment_date = '2024-08-01'
+WHERE student_name = 'Ashish' AND course_id = 'CSE101';
+COMMIT;
+
+COMMIT;
+
+SELECT * FROM StudentEnrollments;
+
+START TRANSACTION;
+SELECT * FROM StudentEnrollments
+WHERE student_name = 'Ashish' AND course_id = 'CSE101'
+FOR UPDATE;
+
+UPDATE StudentEnrollments
+SET enrollment_date = '2024-09-01'
+WHERE student_name = 'Ashish' AND course_id = 'CSE101';
+
+START TRANSACTION;
+UPDATE StudentEnrollments
+SET enrollment_date = '2024-10-01'
+WHERE student_name = 'Ashish' AND course_id = 'CSE101';
+
+COMMIT;
+
+COMMIT;
+
+SELECT * FROM StudentEnrollments
+WHERE student_name = 'Ashish' AND course_id = 'CSE101';
+
+--Practice 3
+DROP TABLE IF EXISTS StudentEnrollments;
+
+CREATE TABLE StudentEnrollments (
+    student_id INT PRIMARY KEY,
+    student_name VARCHAR(100),
+    course_id VARCHAR(10),
+    enrollment_date DATE
+);
+
+INSERT INTO StudentEnrollments VALUES
+(1, 'Ashish', 'CSE101', '2024-06-01'),
+(2, 'Smaran', 'CSE102', '2024-06-01'),
+(3, 'Vaibhav', 'CSE103', '2024-06-01');
+
+START TRANSACTION;
+UPDATE StudentEnrollments SET enrollment_date = '2024-07-01' WHERE student_id = 1;
+UPDATE StudentEnrollments SET enrollment_date = '2024-07-01' WHERE student_id = 2;
+
+START TRANSACTION;
+UPDATE StudentEnrollments SET enrollment_date = '2024-08-01' WHERE student_id = 2;
+UPDATE StudentEnrollments SET enrollment_date = '2024-08-01' WHERE student_id = 1;
+
+SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+START TRANSACTION;
+SELECT enrollment_date FROM StudentEnrollments WHERE student_id = 1;
+
+START TRANSACTION;
+UPDATE StudentEnrollments SET enrollment_date = '2024-07-10' WHERE student_id = 1;
+COMMIT;
+
+SELECT enrollment_date FROM StudentEnrollments WHERE student_id = 1;
+COMMIT;
+
+SELECT enrollment_date FROM StudentEnrollments WHERE student_id = 1;
+
+START TRANSACTION;
+SELECT enrollment_date FROM StudentEnrollments WHERE student_id = 1 FOR UPDATE;
+
+START TRANSACTION;
+SELECT enrollment_date FROM StudentEnrollments WHERE student_id = 1;
+
+SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+START TRANSACTION;
+SELECT enrollment_date FROM StudentEnrollments WHERE student_id = 1;
+
+START TRANSACTION;
+UPDATE StudentEnrollments SET enrollment_date = '2024-08-15' WHERE student_id = 1;
+COMMIT;
+
+SELECT enrollment_date FROM StudentEnrollments WHERE student_id = 1;
+COMMIT;
+
+SELECT enrollment_date FROM StudentEnrollments WHERE student_id = 1;
